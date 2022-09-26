@@ -47,20 +47,12 @@ def get_frequency_list(txt_string):
     # TODO: Iterate through text string, and fill out alphabet_frequency[]
     for i in range(26):
         # substring with one letter 'A' shifted by index i (how to do that? idk)
-        letter = chr(i + 65)
-        print(letter)
+        letter = chr(i + ord('A'))
+        #print("Letter being scanned: " + letter)
 
-        alphabet_frequency[i] = str.count(letter)
+        alphabet_frequency[i] = txt_string.count(letter)
 
     return alphabet_frequency
-
-# def get_frequency_list(txt_string):
-#     alphabet_frequency = []
-
-#     for i in range(26):
-#         alphabet_frequency.append(txt_string.count(ciphertext_alphabet[i]))
-
-#     return alphabet_frequency
 
 # Given a ciphertext substring, return the index of coincidence 
 def get_index_of_coincidence(ciphertext_substring):
@@ -124,15 +116,46 @@ def create_Mg_table(substring_yn_list):
     
     return Mg_table
 
+def find_key(mg_table):
+    key = []
+    for column in mg_table:
+        maxIndex = 0
+        maxValue = 0
+        for g in range(len(column)):
+            if column[g] > maxValue:
+                maxIndex = g
+                maxValue = column[g]
+        key.append(cipher_to_plain_dict[maxIndex])
+    return key
+
+def decrypt_text(cipher, key_table):
+    plaintext_list = []
+    for i in range(len(cipher)):
+        # Convert encrypted letter to number in mod 26
+        cipher_letter = ord(cipher[i]) - ord('A')
+        key_letter = ord(key_table[i % len(key_table)]) - ord('a')
+        #print("Decrypt: " )
+        plaintext_letter = (cipher_letter - key_letter) % 26
+        plaintext_list.append(cipher_to_plain_dict[plaintext_letter])
+    return plaintext_list
+
 
 # For testing purposes
 def test():
     sample_text = "JASONLOUDPAK"
     print(sample_text)
-    get_substring_list(sample_text, 6)
+    sub_list = get_substring_list(sample_text, 6)
+    print(get_vg_list(sub_list[0]))
 
-    sample_frequency = get_frequency_list(sample_text)
+    #sample_frequency = get_frequency(sample_text)
     #print(sample_frequency)
+    # for sub in sub_list:
+    #     print(sub)
+    #     print(get_frequency(sub))
+    #     print(get_vg_list(sub))
+    print(create_Mg_table(sub_list))
+    print(find_key(create_Mg_table(sub_list)))
+    #vg_test = get_vg_list
 
 # Driver code
 def main():
@@ -191,6 +214,12 @@ def main():
 
     # WILL HAVE TO FORMAT THIS!!
     print(Mg_table)
+    key_table = find_key(Mg_table)
+    print(key_table)
+    sneed = decrypt_text(ciphertext, key_table)
+    # print(decrypt_text(ciphertext, key_table))
+    for i in range(len(sneed)):
+        print(sneed[i], end = "")
 
 
     # Part 3
@@ -204,4 +233,4 @@ def main():
 # Do opposite for vice versa
 if __name__ == '__main__':
     test()
-    # main()
+    main()
